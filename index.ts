@@ -29,15 +29,23 @@ let interval_list: IntervalObjectType;
  * checks if the call id exists in the interval-list
  */
 
-const findCallByID = ({ callId, functionId }: idIn): IntervalObj => {
+const findCallByID = ({ callId, functionId }: idIn): IntervalObj | undefined => {
     if (!callId || !functionId) {
-        throw new Error('INTERVAL_ERROR:CallId and functionId is required');
+        throw new Error('INTERVAL_CACHE_ERROR:CallId and functionId is required');
     }
 
     const intervalExists =
         interval_list !== undefined ? interval_list[callId] : [];
     if (Array.isArray(intervalExists) && intervalExists.length > 0) {
-        return interval_list[callId].find((r) => r.callID === functionId);
+        for (const interval of intervalExists) {
+            if (interval?.callID === functionId) {
+                return interval
+            } else {
+                return
+            }
+
+        }
+        return interval_list[callId].find((r) => r?.callID === functionId);
     }
 };
 
