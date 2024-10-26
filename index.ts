@@ -3,33 +3,26 @@ enum Intervals {
     Query = 1 * 60 * 1000,
 }
 
-type IntervalObj = {
+type IntervalStore = {
     callID: string;
     lastFetch: number | string;
 };
 
-type IntervalObjectType = {
-    [key: string]: Array<IntervalObj | undefined>;
+type IntervalStoreObject = {
+    [key: string]: Array<IntervalStore>;
 };
 
-type ListAdd = {
-    callid: string;
-    intervalObject: IntervalObj;
-};
-
-type idIn = {
-    callId: string;
-    functionId: string;
-};
-let interval_list: IntervalObjectType;
+let interval_list: IntervalStoreObject;
 
 /**
- * @param {*} id
+ * @param {*} params
  * @returns a single call that matches the provided ID
  * checks if the call id exists in the interval-list
  */
 
-const findCallByID = ({ callId, functionId }: idIn): IntervalObj | undefined => {
+const findCallByID = (params: { callId: string, functionId: string }): IntervalStore | undefined => {
+
+    const { callId, functionId } = params
     if (!callId || !functionId) {
         throw new Error('INTERVAL_CACHE_ERROR:CallId and functionId is required');
     }
@@ -38,14 +31,14 @@ const findCallByID = ({ callId, functionId }: idIn): IntervalObj | undefined => 
         interval_list !== undefined ? interval_list[callId] : [];
     if (Array.isArray(intervalExists) && intervalExists.length > 0) {
         for (const interval of intervalExists) {
-            if (interval?.callID === functionId) {
+            if (interval.callID === functionId) {
                 return interval
             } else {
                 return
             }
 
         }
-        return interval_list[callId].find((r) => r?.callID === functionId);
+        return interval_list[callId].find((r) => r.callID === functionId);
     }
 };
 
@@ -55,7 +48,7 @@ const findCallByID = ({ callId, functionId }: idIn): IntervalObj | undefined => 
  * checks if the call id exists in the interval-list
  */
 
-const addCallToList = (params: ListAdd) => {
+const addCallToList = (params: { callid: string, intervalObject: IntervalStore }) => {
     const { callid, intervalObject } = params;
 
     // Check that the callid exists before performing any mutation
@@ -89,7 +82,8 @@ const addCallToList = (params: ListAdd) => {
  * @param {*} callID
  * checks if the call id exists in the interval-list
  */
-const intervalCheck = ({ functionId, callId }: idIn): boolean => {
+const intervalCheck = (params: { callId: string, functionId: string }): boolean => {
+    const { callId, functionId } = params
     const callIDexists = findCallByID({ callId, functionId });
 
     const date = new Date();
