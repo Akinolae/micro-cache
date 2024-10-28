@@ -39,7 +39,6 @@ const findCallByID = (params: {
         return;
       }
     }
-    return interval_list[callId].find((r) => r.callID === functionId);
   }
 };
 
